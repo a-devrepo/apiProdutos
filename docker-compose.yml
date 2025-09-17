@@ -1,0 +1,20 @@
+services:
+  apiprodutos-db:
+    image: 'postgres:16'
+    container_name: apiprodutos-postgres
+    restart: always
+    ports:
+      - '5438:5432'
+    environment:
+      POSTGRES_DB: apiprodutosdb
+      POSTGRES_USER: usuariosuser
+      POSTGRES_PASSWORD: usuariospassword
+    volumes:
+      - 'apiprodutosdb-data:/var/lib/postgresql/data'
+    networks:
+      - apiprodutos-network
+volumes:
+  apiprodutosdb-data:
+networks:
+  apiprodutos-network:
+    driver: bridge
