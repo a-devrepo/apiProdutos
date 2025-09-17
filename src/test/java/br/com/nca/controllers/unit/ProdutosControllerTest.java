@@ -14,7 +14,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 
 import br.com.nca.controllers.ProdutosController;
+import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.enums.TipoProduto;
 import br.com.nca.domain.services.ProdutoService;
@@ -114,8 +114,8 @@ public class ProdutosControllerTest {
 	public void deveCadastrarProduto() throws Exception {
 		
 		var faker = new Faker(Locale.of("pt-BR"), new Random(93));
-		
 		UUID id = UUID.randomUUID();
+		
 		var criarProdutoDTO = CriarProdutoDTO.builder()
 				.nome(faker.commerce().productName())
 				.tipo(TipoProduto.MATERIAL)
@@ -124,21 +124,20 @@ public class ProdutosControllerTest {
 				
 		var obterProdutoDTO = ObterProdutoDTO.builder()
 				.id(id)
-				.nome(faker.commerce().productName())
-				.tipo(TipoProduto.MATERIAL)
-				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.nome(criarProdutoDTO.getNome())
+				.tipo(criarProdutoDTO.getTipo())
+				.precoUnitario(criarProdutoDTO.getPrecoUnitario())
 						.build();
-						
 				
 				when(produtoService.cadastrar(criarProdutoDTO)).thenReturn(obterProdutoDTO);
 				
-				var jsonObject = objectMapper.writeValueAsString(criarProdutoDTO);
+				var objetoJson = objectMapper.writeValueAsString(criarProdutoDTO);
 				
 				mockMvc.perform(post("/api/v1/produtos")
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON)
-						.content(jsonObject))
-                    .andExpect(status().isOk())
+						.content(objetoJson))
+                    .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.id").value(id.toString()))
                     .andExpect(jsonPath("$.nome").value(criarProdutoDTO.getNome()))
                     .andExpect(jsonPath("$.tipo").value(criarProdutoDTO.getTipo().toString()))
