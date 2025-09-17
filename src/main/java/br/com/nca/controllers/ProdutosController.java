@@ -1,5 +1,6 @@
 package br.com.nca.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,11 @@ public class ProdutosController {
 	public ResponseEntity<ObterProdutoDTO> getProdutoById(@PathVariable UUID id) {
 		var produto = produtoService.buscarPorId(id);
 		return ResponseEntity.ok(produto);
+	}
+	
+	@GetMapping
+	public ResponseEntity<List<ObterProdutoDTO>> listarProdutos() {
+		var produtos = produtoService.listar();
+		return ResponseEntity.ok(produtos);
 	}
 }
