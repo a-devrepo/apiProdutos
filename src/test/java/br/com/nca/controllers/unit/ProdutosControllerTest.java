@@ -48,21 +48,21 @@ public class ProdutosControllerTest {
 		var faker = new Faker(Locale.of("pt-BR"), new Random(93));
 		
 		UUID id = UUID.randomUUID();
-		var produto = ObterProdutoDTO.builder()
+		var produtoDTO = ObterProdutoDTO.builder()
 				.id(id)
 				.nome(faker.commerce().productName())
 				.tipo(TipoProduto.MATERIAL)
 				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
 						.build();
 				
-				when(produtoService.buscarPorId(id)).thenReturn(produto);
+				when(produtoService.buscarPorId(id)).thenReturn(produtoDTO);
 				
 				mockMvc.perform(get("/api/v1/produtos/{id}", id))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(id.toString()))
-                    .andExpect(jsonPath("$.nome").value(produto.getNome()))
-                    .andExpect(jsonPath("$.tipo").value(produto.getTipo().toString()))
-                    .andExpect(jsonPath("$.precoUnitario").value(produto.getPrecoUnitario().toString()));
+                    .andExpect(jsonPath("$.nome").value(produtoDTO.getNome()))
+                    .andExpect(jsonPath("$.tipo").value(produtoDTO.getTipo().toString()))
+                    .andExpect(jsonPath("$.precoUnitario").value(produtoDTO.getPrecoUnitario().toString()));
 	}
 	
 	@Test
