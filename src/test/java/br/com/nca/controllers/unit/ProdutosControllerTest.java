@@ -2,6 +2,7 @@ package br.com.nca.controllers.unit;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -13,9 +14,11 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -104,5 +107,41 @@ public class ProdutosControllerTest {
                     .andExpect(jsonPath("$[1].nome").value(produtoDTO2.getNome()))
                     .andExpect(jsonPath("$[1].tipo").value(produtoDTO2.getTipo().toString()))
                     .andExpect(jsonPath("$[1].precoUnitario").value(produtoDTO2.getPrecoUnitario().toString()));
+	}
+	
+	@Test
+	@DisplayName("Deve cadastrar produto")
+	public void deveCadastrarProduto() throws Exception {
+		
+		var faker = new Faker(Locale.of("pt-BR"), new Random(93));
+		
+		UUID id = UUID.randomUUID();
+		var criarProdutoDTO = CriarProdutoDTO.builder()
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.build();
+				
+		var obterProdutoDTO = ObterProdutoDTO.builder()
+				.id(id)
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+						.build();
+						
+				
+				when(produtoService.cadastrar(criarProdutoDTO)).thenReturn(obterProdutoDTO);
+				
+				var jsonObject = objectMapper.writeValueAsString(criarProdutoDTO);
+				
+				mockMvc.perform(post("/api/v1/produtos")
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+						.content(jsonObject))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(id.toString()))
+                    .andExpect(jsonPath("$.nome").value(criarProdutoDTO.getNome()))
+                    .andExpect(jsonPath("$.tipo").value(criarProdutoDTO.getTipo().toString()))
+                    .andExpect(jsonPath("$.precoUnitario").value(criarProdutoDTO.getPrecoUnitario().toString()));
 	}
 }
