@@ -2,6 +2,7 @@ package br.com.nca.controllers.unit;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -142,5 +143,41 @@ public class ProdutosControllerTest {
                     .andExpect(jsonPath("$.nome").value(criarProdutoDTO.getNome()))
                     .andExpect(jsonPath("$.tipo").value(criarProdutoDTO.getTipo().toString()))
                     .andExpect(jsonPath("$.precoUnitario").value(criarProdutoDTO.getPrecoUnitario().toString()));
+	}
+	
+	@Test
+	@DisplayName("Deve alterar dados do produto")
+	public void deveAlterarProduto() throws Exception {
+		
+		var faker = new Faker(Locale.of("pt-BR"), new Random(93));
+		UUID id = UUID.randomUUID();
+		
+		var alterarProdutoDTO = AlterarProdutoDTO.builder()
+				.id(id)
+				.nome(alterarProdutoDTO.getNome())
+				.tipo(alterarProdutoDTO.getTipo())
+				.precoUnitario(alterarProdutoDTO.getPrecoUnitario())
+						.build();
+				
+		var obterProdutoDTO = ObterProdutoDTO.builder()
+				.id(id)
+				.nome(alterarProdutoDTO.getNome())
+				.tipo(alterarProdutoDTO.getTipo())
+				.precoUnitario(alterarProdutoDTO.getPrecoUnitario())
+						.build();
+				
+				when(produtoService.alterar(alterarProdutoDTO)).thenReturn(obterProdutoDTO);
+				
+				var objetoJson = objectMapper.writeValueAsString(alterarProdutoDTO);
+				
+				mockMvc.perform(patch("/api/v1/produtos")
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+						.content(objetoJson))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.id").value(id.toString()))
+                    .andExpect(jsonPath("$.nome").value(alterarProdutoDTO.getNome()))
+                    .andExpect(jsonPath("$.tipo").value(alterarProdutoDTO.getTipo().toString()))
+                    .andExpect(jsonPath("$.precoUnitario").value(alterarProdutoDTO.getPrecoUnitario().toString()));
 	}
 }
