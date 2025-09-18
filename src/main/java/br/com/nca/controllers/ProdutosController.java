@@ -17,6 +17,7 @@ import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.services.ProdutoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class ProdutosController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ObterProdutoDTO> cadastrar(@RequestBody CriarProdutoDTO criarProdutoDTO) {
+	public ResponseEntity<ObterProdutoDTO> cadastrar(@RequestBody @Valid final CriarProdutoDTO criarProdutoDTO) {
 		var obterProdutoDTO = produtoService.cadastrar(criarProdutoDTO);
 		return ResponseEntity.status(HttpStatus.CREATED).body(obterProdutoDTO);
 	}
