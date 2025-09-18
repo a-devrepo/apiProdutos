@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 
 import br.com.nca.controllers.ProdutosController;
+import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.enums.TipoProduto;
@@ -154,9 +155,9 @@ public class ProdutosControllerTest {
 		
 		var alterarProdutoDTO = AlterarProdutoDTO.builder()
 				.id(id)
-				.nome(alterarProdutoDTO.getNome())
-				.tipo(alterarProdutoDTO.getTipo())
-				.precoUnitario(alterarProdutoDTO.getPrecoUnitario())
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
 						.build();
 				
 		var obterProdutoDTO = ObterProdutoDTO.builder()
@@ -174,7 +175,7 @@ public class ProdutosControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON)
 						.content(objetoJson))
-                    .andExpect(status().isCreated())
+                    .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(id.toString()))
                     .andExpect(jsonPath("$.nome").value(alterarProdutoDTO.getNome()))
                     .andExpect(jsonPath("$.tipo").value(alterarProdutoDTO.getTipo().toString()))
