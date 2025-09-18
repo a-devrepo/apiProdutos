@@ -1,6 +1,10 @@
 package br.com.nca.controllers.unit;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -199,6 +203,10 @@ public class ProdutosControllerTest {
 						.accept(MediaType.APPLICATION_JSON)
 						.content(objetoJson))
                     .andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.errors").isArray());
+                    .andExpect(jsonPath("$.errors").isArray())
+                    .andExpect(jsonPath("$.errors", hasSize(3)))
+                    .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'nome' : Nome é obrigatório."))))
+                    .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'tipo' : Tipo é obrigatório."))))
+                    .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'precoUnitario' : Preço unitário é obrigatório."))));
 	}
 }
