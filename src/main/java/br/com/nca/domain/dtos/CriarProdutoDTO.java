@@ -20,7 +20,7 @@ public class CriarProdutoDTO {
 	@Pattern(regexp = "^[A-Za-zÀ-ú0-9 ]+$", message = "Nome deve conter apenas letras, números e espaços.")
 	private String nome;
 	
-	@NotBlank(message = "Tipo é obrigatório.")
+	@NotNull(message = "Tipo é obrigatório.")
 	private TipoProduto tipo;
 	
 	@NotNull(message = "Preço unitário é obrigatório.")
