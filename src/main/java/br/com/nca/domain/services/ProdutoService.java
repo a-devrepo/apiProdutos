@@ -3,6 +3,7 @@ package br.com.nca.domain.services;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 
@@ -13,4 +14,6 @@ public interface ProdutoService {
 	List<ObterProdutoDTO> listar();
 
 	ObterProdutoDTO cadastrar(CriarProdutoDTO criarProdutoDTO);
+
+	ObterProdutoDTO alterar(AlterarProdutoDTO alterarProdutoDTO);
 }
