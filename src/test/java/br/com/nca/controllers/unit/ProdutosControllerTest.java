@@ -227,7 +227,7 @@ public class ProdutosControllerTest {
 	            when(produtoService.desativar(id)).thenReturn(produtoDTO);
 				
 				
-	            mockMvc.perform(get("/api/v1/produtos/{id}", id))
+	            mockMvc.perform(delete("/api/v1/produtos/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.nome").value(produtoDTO.getNome()))
