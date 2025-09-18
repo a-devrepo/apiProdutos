@@ -181,4 +181,24 @@ public class ProdutosControllerTest {
                     .andExpect(jsonPath("$.tipo").value(alterarProdutoDTO.getTipo().toString()))
                     .andExpect(jsonPath("$.precoUnitario").value(alterarProdutoDTO.getPrecoUnitario().toString()));
 	}
+	
+	@Test
+	@DisplayName("Deve validar os campos como obrigatórios")
+	public void deveValidarCamposObrigatorios() throws Exception {
+		
+		var criarProdutoDTO = CriarProdutoDTO.builder()
+				.nome(null)
+				.tipo(null)
+				.precoUnitario(null)
+				.build();
+				
+				var objetoJson = objectMapper.writeValueAsString(criarProdutoDTO);
+				
+				mockMvc.perform(post("/api/v1/produtos")
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+						.content(objetoJson))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.errors").isArray());
+	}
 }
