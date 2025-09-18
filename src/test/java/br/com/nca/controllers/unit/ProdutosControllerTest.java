@@ -1,7 +1,12 @@
 package br.com.nca.controllers.unit;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 
 import br.com.nca.controllers.ProdutosController;
+import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.enums.TipoProduto;
@@ -142,5 +148,65 @@ public class ProdutosControllerTest {
                     .andExpect(jsonPath("$.nome").value(criarProdutoDTO.getNome()))
                     .andExpect(jsonPath("$.tipo").value(criarProdutoDTO.getTipo().toString()))
                     .andExpect(jsonPath("$.precoUnitario").value(criarProdutoDTO.getPrecoUnitario().toString()));
+	}
+	
+	@Test
+	@DisplayName("Deve alterar dados do produto")
+	public void deveAlterarProduto() throws Exception {
+		
+		var faker = new Faker(Locale.of("pt-BR"), new Random(93));
+		UUID id = UUID.randomUUID();
+		
+		var alterarProdutoDTO = AlterarProdutoDTO.builder()
+				.id(id)
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+						.build();
+				
+		var obterProdutoDTO = ObterProdutoDTO.builder()
+				.id(id)
+				.nome(alterarProdutoDTO.getNome())
+				.tipo(alterarProdutoDTO.getTipo())
+				.precoUnitario(alterarProdutoDTO.getPrecoUnitario())
+						.build();
+				
+				when(produtoService.alterar(alterarProdutoDTO)).thenReturn(obterProdutoDTO);
+				
+				var objetoJson = objectMapper.writeValueAsString(alterarProdutoDTO);
+				
+				mockMvc.perform(patch("/api/v1/produtos")
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+						.content(objetoJson))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(id.toString()))
+                    .andExpect(jsonPath("$.nome").value(alterarProdutoDTO.getNome()))
+                    .andExpect(jsonPath("$.tipo").value(alterarProdutoDTO.getTipo().toString()))
+                    .andExpect(jsonPath("$.precoUnitario").value(alterarProdutoDTO.getPrecoUnitario().toString()));
+	}
+	
+	@Test
+	@DisplayName("Deve validar os campos como obrigatórios")
+	public void deveValidarCamposObrigatorios() throws Exception {
+		
+		var criarProdutoDTO = CriarProdutoDTO.builder()
+				.nome(null)
+				.tipo(null)
+				.precoUnitario(null)
+				.build();
+				
+				var objetoJson = objectMapper.writeValueAsString(criarProdutoDTO);
+				
+				mockMvc.perform(post("/api/v1/produtos")
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+						.content(objetoJson))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.errors").isArray())
+                    .andExpect(jsonPath("$.errors", hasSize(3)))
+                    .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'nome' : Nome é obrigatório."))))
+                    .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'tipo' : Tipo é obrigatório."))))
+                    .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'precoUnitario' : Preço unitário é obrigatório."))));
 	}
 }
