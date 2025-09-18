@@ -16,4 +16,6 @@ public interface ProdutoService {
 	ObterProdutoDTO cadastrar(CriarProdutoDTO criarProdutoDTO);
 
 	ObterProdutoDTO alterar(AlterarProdutoDTO alterarProdutoDTO);
+
+	ObterProdutoDTO desativar(UUID id);
 }

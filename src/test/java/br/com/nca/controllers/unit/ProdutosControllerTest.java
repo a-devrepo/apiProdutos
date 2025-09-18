@@ -209,4 +209,29 @@ public class ProdutosControllerTest {
                     .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'tipo' : Tipo é obrigatório."))))
                     .andExpect(jsonPath("$.errors[*]", hasItem(containsString("Campo: 'precoUnitario' : Preço unitário é obrigatório."))));
 	}
+	
+	@Test
+	@DisplayName("Deve realizar exclusão lógica do produto por ID")
+	public void deveRealizarExclusaoLogica() throws Exception {
+		
+      var faker = new Faker(Locale.of("pt-BR"), new Random(93));
+		
+	  UUID id = UUID.randomUUID();
+	  var produtoDTO = ObterProdutoDTO.builder()
+				.id(id)
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.build();
+		
+	            when(produtoService.desativar(id)).thenReturn(produtoDTO);
+				
+				
+	            mockMvc.perform(delete("/api/v1/produtos/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.nome").value(produtoDTO.getNome()))
+                .andExpect(jsonPath("$.tipo").value(produtoDTO.getTipo().toString()))
+                .andExpect(jsonPath("$.precoUnitario").value(produtoDTO.getPrecoUnitario().toString()));
+	}
 }
