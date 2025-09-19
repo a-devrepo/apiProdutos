@@ -234,4 +234,29 @@ public class ProdutosControllerTest {
                 .andExpect(jsonPath("$.tipo").value(produtoDTO.getTipo().toString()))
                 .andExpect(jsonPath("$.precoUnitario").value(produtoDTO.getPrecoUnitario().toString()));
 	}
+	
+	@Test
+	@DisplayName("Deve retornar quantidade e preço médio por tipo de produto")
+	public void deveRetornarQuantiadePrecoMedioPorTipo() throws Exception {
+		
+      var faker = new Faker(Locale.of("pt-BR"), new Random(93));
+		
+	  UUID id = UUID.randomUUID();
+	  var precoMedioDTO = ObterPrecoMedioProdutoDTO.builder()
+	            .nome(faker.commerce().productName())
+	            .tipo(TipoProduto.MATERIAL)
+	            .quantidade(3)
+	            .precoMedio(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+	            .build();
+
+	    when(produtoService.obterPrecoMedioPorTipo()).thenReturn(List.of(precoMedioDTO));
+
+	    mockMvc.perform(get("/api/v1/produtos/preco-medio")
+	            .accept(MediaType.APPLICATION_JSON))
+	        .andExpect(status().isOk())
+	        .andExpect(jsonPath("$[0].nome").value(precoMedioDTO.getNome()))
+	        .andExpect(jsonPath("$[0].tipo").value(precoMedioDTO.getTipo().toString()))
+	        .andExpect(jsonPath("$[0].quantidade").value(3))
+	        .andExpect(jsonPath("$[0].precoMedio").value(precoMedioDTO.getPrecoMedio().toString()));
+	}
 }
