@@ -32,6 +32,7 @@ import com.github.javafaker.Faker;
 import br.com.nca.controllers.ProdutosController;
 import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
+import br.com.nca.domain.dtos.ObterPrecoMedioProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.enums.TipoProduto;
 import br.com.nca.domain.services.ProdutoService;
