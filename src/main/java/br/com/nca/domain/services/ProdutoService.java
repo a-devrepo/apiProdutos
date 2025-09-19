@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
+import br.com.nca.domain.dtos.ObterPrecoMedioProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 
 public interface ProdutoService {
@@ -18,4 +19,6 @@ public interface ProdutoService {
 	ObterProdutoDTO alterar(AlterarProdutoDTO alterarProdutoDTO);
 
 	ObterProdutoDTO desativar(UUID id);
+
+	List<ObterPrecoMedioProdutoDTO> obterPrecoMedioPorTipo();
 }
