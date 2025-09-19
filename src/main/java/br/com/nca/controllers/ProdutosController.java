@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
+import br.com.nca.domain.dtos.ObterPrecoMedioProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.services.ProdutoService;
 import jakarta.validation.Valid;
@@ -56,5 +57,11 @@ public class ProdutosController {
 	public ResponseEntity<ObterProdutoDTO> excluir(@PathVariable final UUID id) {
 		var obterProdutoDTO = produtoService.desativar(id);
 		return ResponseEntity.ok(obterProdutoDTO);
+	}
+	
+	@GetMapping("/preco-medio")
+	public ResponseEntity<List<ObterPrecoMedioProdutoDTO>> getPrecoMedioProduto() {
+		var listaPrecoMedioTipoDTO = produtoService.obterPrecoMedioPorTipo();
+		return ResponseEntity.ok(listaPrecoMedioTipoDTO);
 	}
 }
