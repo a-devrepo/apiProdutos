@@ -10,6 +10,7 @@ import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterPrecoMedioProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
+import br.com.nca.domain.entities.Produto;
 import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
 import br.com.nca.domain.repositories.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +43,10 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	public ObterProdutoDTO cadastrar(CriarProdutoDTO criarProdutoDTO) {
-		// TODO Auto-generated method stub
-		return null;
+		var produto = modelMapper.map(criarProdutoDTO,Produto.class);
+		produto.setAtivo(true);
+		var produtoCadastrado = produtoRepository.save(produto);
+		return modelMapper.map(produtoCadastrado, ObterProdutoDTO.class);
 	}
 
 	@Override
