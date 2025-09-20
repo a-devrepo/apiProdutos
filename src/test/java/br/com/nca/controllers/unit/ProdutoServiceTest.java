@@ -3,6 +3,7 @@ package br.com.nca.controllers.unit;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ import org.modelmapper.ModelMapper;
 
 import com.github.javafaker.Faker;
 
+import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.entities.Produto;
 import br.com.nca.domain.enums.TipoProduto;
@@ -61,12 +63,7 @@ public class ProdutoServiceTest {
 				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
 						.build();
 		
-		var produtoEntity = Produto.builder().id(obterProdutoDTO.getId())
-				.nome(obterProdutoDTO.getNome())
-				.tipo(obterProdutoDTO.getTipo())
-				.precoUnitario(obterProdutoDTO.getPrecoUnitario())
-				.ativo(true)
-				.build();
+		var produtoEntity = getProdutoEntity(obterProdutoDTO);
 				
 				when(produtoRepository.findByIdAndAtivoTrue(id)).thenReturn(Optional.ofNullable(produtoEntity));
 				when(modelMapper.map(produtoEntity,ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
@@ -88,5 +85,64 @@ public class ProdutoServiceTest {
 		assertThatThrownBy(() -> produtoService
                 .buscarPorId(id))
         .isInstanceOf(RecursoNaoEncontradoException.class);		
+	}
+	
+	@Test
+	@DisplayName("Deve salvar produto com sucesso")
+	public void deveSalvarProdutoComSucesso() throws Exception {
+		
+		var criarProdutoDTO = getCriarProdutoDTO();
+		var produtoEntity = getProdutoEntity();
+		var obterProdutoDTO = getObterProdutoDTO(produtoEntity.getId());	
+				
+        when(produtoRepository.save(any(Produto.class))).thenReturn(produtoEntity);
+        when(modelMapper.map(produtoEntity,ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
+				
+				var resultado = produtoService.cadastrar(criarProdutoDTO);
+				
+				assertNotNull(resultado);
+				assertEquals(criarProdutoDTO.getNome(), obterProdutoDTO.getNome());
+	}
+
+	private Produto getProdutoEntity(ObterProdutoDTO obterProdutoDTO) {
+		var produtoEntity = Produto.builder().id(obterProdutoDTO.getId())
+				.nome(obterProdutoDTO.getNome())
+				.tipo(obterProdutoDTO.getTipo())
+				.precoUnitario(obterProdutoDTO.getPrecoUnitario())
+				.ativo(true)
+				.build();
+		return produtoEntity;
+	}
+	
+	private ObterProdutoDTO getObterProdutoDTO(UUID id) {
+		
+		var obterProdutoDTO = ObterProdutoDTO.builder()
+				.id(id)
+				.nome(faker.name().fullName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.build();
+		return obterProdutoDTO;
+	}
+	
+    private CriarProdutoDTO getCriarProdutoDTO() {
+		
+		var criarProdutoDTO = CriarProdutoDTO.builder()
+				.nome(faker.name().fullName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.build();
+		return criarProdutoDTO;
+	}
+	
+	private Produto getProdutoEntity() {
+		
+		var produtoEntity = Produto.builder().id(UUID.randomUUID())
+				.nome(faker.name().fullName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.ativo(true)
+				.build();
+		return produtoEntity;
 	}
 }
