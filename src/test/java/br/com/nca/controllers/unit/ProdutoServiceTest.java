@@ -1,14 +1,13 @@
 package br.com.nca.controllers.unit;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -18,12 +17,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
 import com.github.javafaker.Faker;
 
 import br.com.nca.domain.dtos.ObterProdutoDTO;
+import br.com.nca.domain.entities.Produto;
 import br.com.nca.domain.enums.TipoProduto;
+import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
+import br.com.nca.domain.repositories.ProdutoRepository;
 import br.com.nca.domain.services.ProdutoService;
+import br.com.nca.domain.services.ProdutoServiceImpl;
 
 @DisplayName("Testes unitários para ProdutoService")
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +46,7 @@ public class ProdutoServiceTest {
 	@BeforeEach
 	public void setup() {
 		faker = new Faker(Locale.of("pt-BR"), new Random(93));
-		produtoService = new ProdutoService(produtoRepository, modelMapper);
+		produtoService = new ProdutoServiceImpl(produtoRepository, modelMapper);
 	}
 	
 	@Test
@@ -64,12 +68,25 @@ public class ProdutoServiceTest {
 				.ativo(true)
 				.build();
 				
-				when(produtoRepository.buscarPorIdAndAtivoTrue(id)).thenReturn(produtoEntity);
+				when(produtoRepository.findByIdAndAtivoTrue(id)).thenReturn(Optional.ofNullable(produtoEntity));
 				when(modelMapper.map(produtoEntity,ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
 				
 				var resultado = produtoService.buscarPorId(id);
 				
 				assertNotNull(resultado);
 				assertEquals(resultado.getNome(), produtoEntity.getNome());
+	}
+
+	@Test
+	@DisplayName("Deve lançar Exception quando produto não for encontrado")
+	public void deveLancarExceptionQuandoProdutoNaoEncontrado() throws Exception {
+		
+		UUID id = UUID.randomUUID();
+		
+		when(produtoRepository.findByIdAndAtivoTrue(id)).thenReturn(Optional.ofNullable(null));
+				
+		assertThatThrownBy(() -> produtoService
+                .buscarPorId(id))
+        .isInstanceOf(RecursoNaoEncontradoException.class);		
 	}
 }
