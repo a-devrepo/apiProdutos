@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<java-faker.version>1.0.2</java-faker.version>
+		<model-mapper.version>3.2.4</model-mapper.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -70,6 +71,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <dependency>
+   		    <groupId>org.modelmapper.extensions</groupId>
+   		    <artifactId>modelmapper-spring</artifactId>
+   		    <version>${model-mapper.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
