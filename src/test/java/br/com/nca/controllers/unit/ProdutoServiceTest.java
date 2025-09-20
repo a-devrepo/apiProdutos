@@ -22,6 +22,7 @@ import org.modelmapper.ModelMapper;
 
 import com.github.javafaker.Faker;
 
+import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.entities.Produto;
@@ -105,12 +106,43 @@ public class ProdutoServiceTest {
 		assertNotNull(resultado);
 		assertEquals(criarProdutoDTO.getNome(), obterProdutoDTO.getNome());
 	}
+	
+	@Test
+	@DisplayName("Deve alterar produto com sucesso")
+	public void deveAlterarProdutoComSucesso() throws Exception {
+		
+		var alterarProdutoDTO = getAlterarProdutoDTO();
+		var produtoEntity = getProdutoEntity(alterarProdutoDTO.getId());
+		var produtoCadastrado = getProdutoCadastrado(produtoEntity);
+		var obterProdutoDTO = getObterProdutoDTO(produtoCadastrado);	
+		
+        when(produtoRepository.findByIdAndAtivoTrue(any(UUID.class))).thenReturn(Optional.ofNullable(produtoEntity));
+        when(produtoRepository.save(any(Produto.class))).thenReturn(produtoCadastrado);
+        when(modelMapper.map(produtoCadastrado, ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
+        
+		var resultado = produtoService.alterar(alterarProdutoDTO);
+				
+		assertNotNull(resultado);
+		assertEquals(alterarProdutoDTO.getNome(), obterProdutoDTO.getNome());
+	}
 
 	private Produto getProdutoEntity(ObterProdutoDTO obterProdutoDTO) {
 		var produtoEntity = Produto.builder().id(obterProdutoDTO.getId())
 				.nome(obterProdutoDTO.getNome())
 				.tipo(obterProdutoDTO.getTipo())
 				.precoUnitario(obterProdutoDTO.getPrecoUnitario())
+				.ativo(true)
+				.build();
+		return produtoEntity;
+	}
+	
+	private Produto getProdutoEntity(UUID id) {
+		var produtoEntity = Produto.builder().id(id)
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(
+						new BigDecimal(
+								faker.commerce().price(10.0, 500.0).replace(",", ".")))
 				.ativo(true)
 				.build();
 		return produtoEntity;
@@ -135,6 +167,17 @@ public class ProdutoServiceTest {
 				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
 				.build();
 		return criarProdutoDTO;
+	}
+    
+    private AlterarProdutoDTO getAlterarProdutoDTO() {
+		
+		var alterarProdutoDTO = AlterarProdutoDTO.builder()
+				.id(UUID.randomUUID())
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.build();
+		return alterarProdutoDTO;
 	}
 	
 	private Produto getProdutoEntity(CriarProdutoDTO criarProdutoDTO) {
