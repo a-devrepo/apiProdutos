@@ -107,4 +107,25 @@ public class ProdutoServiceTest {
         assertNotNull(resultado);
         assertEquals(alterarProdutoDTO.getNome(), obterProdutoDTO.getNome());
     }
+
+    @Test
+    @DisplayName("Deve excluir produto com sucesso")
+    public void deveExcluirProdutoComSucesso() throws Exception {
+
+        var id = UUID.randomUUID();
+        var produtoEntity = getProdutoEntity(id);
+
+        when(produtoRepository.findByIdAndAtivoTrue(any(UUID.class))).thenReturn(Optional.of(produtoEntity));
+
+        produtoEntity.setAtivo(false);
+        var obterProdutoDTO = getObterProdutoDTO(produtoEntity);
+
+        when(produtoRepository.save(any(Produto.class))).thenReturn(produtoEntity);
+        when(modelMapper.map(produtoEntity, ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
+
+        var resultado = produtoService.desativar(id);
+
+        assertNotNull(resultado);
+        assertEquals(id, obterProdutoDTO.getId());
+    }
 }
