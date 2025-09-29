@@ -1,6 +1,7 @@
 package br.com.nca.domain.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
@@ -22,7 +23,6 @@ public class ProdutoServiceImpl implements ProdutoService {
 	private final ProdutoRepository produtoRepository;
 	
 	private final ModelMapper modelMapper;
-	
 	
 	@Override
 	public ObterProdutoDTO buscarPorId(UUID id) {
@@ -51,22 +51,16 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	public ObterProdutoDTO alterar(AlterarProdutoDTO alterarProdutoDTO) {
+
 		var produto = produtoRepository.findByIdAndAtivoTrue(alterarProdutoDTO.getId());
+
 		if (produto.isEmpty()) {
 			throw new RecursoNaoEncontradoException();
 		}
-		
-		if (alterarProdutoDTO.getNome() != null) {
-			produto.get().setNome(alterarProdutoDTO.getNome());
-		}
-		if (alterarProdutoDTO.getTipo() != null) {
-			produto.get().setTipo(alterarProdutoDTO.getTipo());
-		}
-		if (alterarProdutoDTO.getPrecoUnitario() != null) {
-			produto.get().setPrecoUnitario(alterarProdutoDTO.getPrecoUnitario());
-		}
-		
-	   var produtoAlterardo = produtoRepository.save(produto.get());
+
+		alterarCampos(alterarProdutoDTO, produto.get());
+
+		var produtoAlterardo = produtoRepository.save(produto.get());
 	   return modelMapper.map(produtoAlterardo, ObterProdutoDTO.class);
 	}
 
@@ -80,5 +74,11 @@ public class ProdutoServiceImpl implements ProdutoService {
 	public List<ObterPrecoMedioProdutoDTO> obterPrecoMedioPorTipo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	private void alterarCampos(AlterarProdutoDTO dto, Produto produto) {
+		Optional.ofNullable(dto.getNome()).ifPresent(produto::setNome);
+		Optional.ofNullable(dto.getTipo()).ifPresent(produto::setTipo);
+		Optional.ofNullable(dto.getPrecoUnitario()).ifPresent(produto::setPrecoUnitario);
 	}
 }
