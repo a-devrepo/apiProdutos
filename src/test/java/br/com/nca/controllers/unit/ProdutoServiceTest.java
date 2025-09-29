@@ -1,5 +1,6 @@
 package br.com.nca.controllers.unit;
 
+import static br.com.nca.controllers.unit.utils.ProdutoTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import br.com.nca.controllers.unit.utils.ProdutoTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import org.modelmapper.ModelMapper;
 
 import com.github.javafaker.Faker;
 
+import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.entities.Produto;
@@ -105,12 +108,42 @@ public class ProdutoServiceTest {
 		assertNotNull(resultado);
 		assertEquals(criarProdutoDTO.getNome(), obterProdutoDTO.getNome());
 	}
+	
+	@Test
+	@DisplayName("Deve alterar produto com sucesso")
+	public void deveAlterarProdutoComSucesso() throws Exception {
+		
+		var produtoEntity = ProdutoTestUtils.getProdutoEntity(UUID.randomUUID());
+		var alterarProdutoDTO = ProdutoTestUtils.getAlterarProdutoDTO(produtoEntity);
+		var obterProdutoDTO = ProdutoTestUtils.getObterProdutoDTO(produtoEntity);
+		
+        when(produtoRepository.findByIdAndAtivoTrue(any(UUID.class))).thenReturn(Optional.of(produtoEntity));
+        when(produtoRepository.save(any(Produto.class))).thenReturn(produtoEntity);
+        when(modelMapper.map(produtoEntity, ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
+        
+		var resultado = produtoService.alterar(alterarProdutoDTO);
+				
+		assertNotNull(resultado);
+		assertEquals(alterarProdutoDTO.getNome(), obterProdutoDTO.getNome());
+	}
 
 	private Produto getProdutoEntity(ObterProdutoDTO obterProdutoDTO) {
 		var produtoEntity = Produto.builder().id(obterProdutoDTO.getId())
 				.nome(obterProdutoDTO.getNome())
 				.tipo(obterProdutoDTO.getTipo())
 				.precoUnitario(obterProdutoDTO.getPrecoUnitario())
+				.ativo(true)
+				.build();
+		return produtoEntity;
+	}
+	
+	private Produto getProdutoEntity(UUID id) {
+		var produtoEntity = Produto.builder().id(id)
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(
+						new BigDecimal(
+								faker.commerce().price(10.0, 500.0).replace(",", ".")))
 				.ativo(true)
 				.build();
 		return produtoEntity;
@@ -135,6 +168,17 @@ public class ProdutoServiceTest {
 				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
 				.build();
 		return criarProdutoDTO;
+	}
+    
+    private AlterarProdutoDTO getAlterarProdutoDTO() {
+		
+		var alterarProdutoDTO = AlterarProdutoDTO.builder()
+				.id(UUID.randomUUID())
+				.nome(faker.commerce().productName())
+				.tipo(TipoProduto.MATERIAL)
+				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+				.build();
+		return alterarProdutoDTO;
 	}
 	
 	private Produto getProdutoEntity(CriarProdutoDTO criarProdutoDTO) {

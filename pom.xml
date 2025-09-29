@@ -30,6 +30,7 @@
 		<java.version>21</java.version>
 		<java-faker.version>1.0.2</java-faker.version>
 		<model-mapper.version>3.2.4</model-mapper.version>
+		<lombok.version>1.18.34</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -55,7 +56,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -72,9 +74,9 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
-   		    <groupId>org.modelmapper.extensions</groupId>
-   		    <artifactId>modelmapper-spring</artifactId>
-   		    <version>${model-mapper.version}</version>
+            <groupId>org.modelmapper.extensions</groupId>
+			<artifactId>modelmapper-spring</artifactId>
+			<version>${model-mapper.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -88,6 +90,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

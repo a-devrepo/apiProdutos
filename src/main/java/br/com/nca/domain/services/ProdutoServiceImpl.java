@@ -51,8 +51,23 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	public ObterProdutoDTO alterar(AlterarProdutoDTO alterarProdutoDTO) {
-		// TODO Auto-generated method stub
-		return null;
+		var produto = produtoRepository.findByIdAndAtivoTrue(alterarProdutoDTO.getId());
+		if (produto.isEmpty()) {
+			throw new RecursoNaoEncontradoException();
+		}
+		
+		if (alterarProdutoDTO.getNome() != null) {
+			produto.get().setNome(alterarProdutoDTO.getNome());
+		}
+		if (alterarProdutoDTO.getTipo() != null) {
+			produto.get().setTipo(alterarProdutoDTO.getTipo());
+		}
+		if (alterarProdutoDTO.getPrecoUnitario() != null) {
+			produto.get().setPrecoUnitario(alterarProdutoDTO.getPrecoUnitario());
+		}
+		
+	   var produtoAlterardo = produtoRepository.save(produto.get());
+	   return modelMapper.map(produtoAlterardo, ObterProdutoDTO.class);
 	}
 
 	@Override
