@@ -1,5 +1,6 @@
 package br.com.nca.controllers.unit;
 
+import static br.com.nca.controllers.unit.utils.ProdutoTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import br.com.nca.controllers.unit.utils.ProdutoTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -111,14 +113,13 @@ public class ProdutoServiceTest {
 	@DisplayName("Deve alterar produto com sucesso")
 	public void deveAlterarProdutoComSucesso() throws Exception {
 		
-		var alterarProdutoDTO = getAlterarProdutoDTO();
-		var produtoEntity = getProdutoEntity(alterarProdutoDTO.getId());
-		var produtoCadastrado = getProdutoCadastrado(produtoEntity);
-		var obterProdutoDTO = getObterProdutoDTO(produtoCadastrado);	
+		var produtoEntity = ProdutoTestUtils.getProdutoEntity(UUID.randomUUID());
+		var alterarProdutoDTO = ProdutoTestUtils.getAlterarProdutoDTO(produtoEntity);
+		var obterProdutoDTO = ProdutoTestUtils.getObterProdutoDTO(produtoEntity);
 		
-        when(produtoRepository.findByIdAndAtivoTrue(any(UUID.class))).thenReturn(Optional.ofNullable(produtoEntity));
-        when(produtoRepository.save(any(Produto.class))).thenReturn(produtoCadastrado);
-        when(modelMapper.map(produtoCadastrado, ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
+        when(produtoRepository.findByIdAndAtivoTrue(any(UUID.class))).thenReturn(Optional.of(produtoEntity));
+        when(produtoRepository.save(any(Produto.class))).thenReturn(produtoEntity);
+        when(modelMapper.map(produtoEntity, ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
         
 		var resultado = produtoService.alterar(alterarProdutoDTO);
 				
