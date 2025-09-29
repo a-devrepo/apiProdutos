@@ -64,12 +64,12 @@ public class ProdutoTestUtils {
                 .build();
     }
 
-    public static AlterarProdutoDTO getAlterarProdutoDTO() {
+    public static AlterarProdutoDTO getAlterarProdutoDTO(Produto produto) {
         return AlterarProdutoDTO.builder()
-                .id(UUID.randomUUID())
-                .nome(faker.commerce().productName())
-                .tipo(TipoProduto.MATERIAL)
-                .precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
+                .id(produto.getId())
+                .nome(produto.getNome())
+                .tipo(produto.getTipo())
+                .precoUnitario(produto.getPrecoUnitario())
                 .build();
     }
 
