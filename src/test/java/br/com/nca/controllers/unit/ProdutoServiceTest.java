@@ -13,7 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,6 +61,29 @@ public class ProdutoServiceTest {
 
         assertNotNull(resultado);
         assertEquals(resultado.getNome(), produtoEntity.getNome());
+    }
+
+    @Test
+    @DisplayName("Deve retornar page com produtos")
+    public void deveRetornarPageProdutos() throws Exception {
+
+        UUID id = UUID.randomUUID();
+        var produtoEntity = getProdutoEntity(id);
+        var obterProdutoDTO = getObterProdutoDTO(produtoEntity);
+
+        var pageRequest = PageRequest.of(0, 10,Sort.by(Sort.Direction.ASC, "nome"));
+        var page = new PageImpl<>(List.of(produtoEntity), pageRequest,1);
+
+        when(produtoRepository.findByAtivoTrue(pageRequest)).thenReturn(page);
+        when(modelMapper.map(produtoEntity, ObterProdutoDTO.class)).thenReturn(obterProdutoDTO);
+
+        var resultado = produtoService.listar(0,10,"nome","asc");
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(obterProdutoDTO.getId(), resultado.getContent().getFirst().getId());
+        assertEquals(obterProdutoDTO.getNome(), resultado.getContent().getFirst().getNome());
+        assertEquals(obterProdutoDTO.getPrecoUnitario(), resultado.getContent().getFirst().getPrecoUnitario());
     }
 
     @Test
