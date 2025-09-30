@@ -2,7 +2,9 @@ package br.com.nca.controllers.unit;
 
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.entities.Produto;
+import br.com.nca.domain.enums.TipoProduto;
 import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
+import br.com.nca.domain.repositories.PrecoMedioProjection;
 import br.com.nca.domain.repositories.ProdutoRepository;
 import br.com.nca.domain.services.ProdutoService;
 import br.com.nca.domain.services.ProdutoServiceImpl;
@@ -11,22 +13,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static br.com.nca.controllers.unit.utils.ProdutoTestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Testes unitários para ProdutoService")
 @ExtendWith(MockitoExtension.class)
@@ -154,5 +159,42 @@ public class ProdutoServiceTest {
 
         assertNotNull(resultado);
         assertEquals(id, obterProdutoDTO.getId());
+    }
+
+    @Test
+    @DisplayName("Deve retornar preço médio de produtos por tipo")
+    public void deveRetornarPrecoMedioPorTipo() throws Exception {
+
+        PrecoMedioProjection projection1 = Mockito.mock(PrecoMedioProjection.class);
+        PrecoMedioProjection projection2 = Mockito.mock(PrecoMedioProjection.class);
+
+        when(projection1.getNome()).thenReturn("Caderno");
+        when(projection1.getTipo()).thenReturn(TipoProduto.MATERIAL);
+        when(projection1.getQuantidade()).thenReturn(3);
+        when(projection1.getPrecoMedio()).thenReturn(new BigDecimal("15.50"));
+
+        when(projection2.getNome()).thenReturn("Lápis");
+        when(projection2.getTipo()).thenReturn(TipoProduto.MATERIAL);
+        when(projection2.getQuantidade()).thenReturn(5);
+        when(projection2.getPrecoMedio()).thenReturn(new BigDecimal("2.30"));
+
+        when(produtoRepository.obterPrecoMedioPorTipo())
+                .thenReturn(List.of(projection1, projection2));
+
+        var resultado = produtoService.obterPrecoMedioPorTipo();
+
+        assertThat(resultado).hasSize(2);
+
+        assertThat(resultado.get(0).getNome()).isEqualTo("Caderno");
+        assertThat(resultado.get(0).getTipo()).isEqualTo(TipoProduto.MATERIAL);
+        assertThat(resultado.get(0).getQuantidade()).isEqualTo(3);
+        assertThat(resultado.get(0).getPrecoMedio()).isEqualByComparingTo("15.50");
+
+        assertThat(resultado.get(1).getNome()).isEqualTo("Lápis");
+        assertThat(resultado.get(1).getTipo()).isEqualTo(TipoProduto.MATERIAL);
+        assertThat(resultado.get(1).getQuantidade()).isEqualTo(5);
+        assertThat(resultado.get(1).getPrecoMedio()).isEqualByComparingTo("2.30");
+
+        verify(produtoRepository, times(1)).obterPrecoMedioPorTipo();
     }
 }
