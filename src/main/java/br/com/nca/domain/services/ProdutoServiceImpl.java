@@ -1,12 +1,5 @@
 package br.com.nca.domain.services;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
-
 import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterPrecoMedioProdutoDTO;
@@ -15,6 +8,12 @@ import br.com.nca.domain.entities.Produto;
 import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
 import br.com.nca.domain.repositories.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,13 +25,11 @@ public class ProdutoServiceImpl implements ProdutoService {
 	
 	@Override
 	public ObterProdutoDTO buscarPorId(UUID id) {
-		var produto = produtoRepository.findByIdAndAtivoTrue(id);
-		
-		if (produto.isEmpty()) {
-			throw new RecursoNaoEncontradoException();
-		}
-		
-		return modelMapper.map(produto.get(), ObterProdutoDTO.class);
+
+		var produto = produtoRepository.findByIdAndAtivoTrue(id)
+				.orElseThrow(RecursoNaoEncontradoException::new);
+
+		return modelMapper.map(produto, ObterProdutoDTO.class);
 	}
 
 	@Override
@@ -43,25 +40,24 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	public ObterProdutoDTO cadastrar(CriarProdutoDTO criarProdutoDTO) {
+
 		var produto = modelMapper.map(criarProdutoDTO,Produto.class);
 		produto.setAtivo(true);
-		var produtoCadastrado = produtoRepository.save(produto);
-		return modelMapper.map(produtoCadastrado, ObterProdutoDTO.class);
+		produtoRepository.save(produto);
+
+		return modelMapper.map(produto, ObterProdutoDTO.class);
 	}
 
 	@Override
 	public ObterProdutoDTO alterar(AlterarProdutoDTO alterarProdutoDTO) {
 
-		var produto = produtoRepository.findByIdAndAtivoTrue(alterarProdutoDTO.getId());
+		var produto = produtoRepository.findByIdAndAtivoTrue(alterarProdutoDTO.getId())
+				.orElseThrow(RecursoNaoEncontradoException::new);
 
-		if (produto.isEmpty()) {
-			throw new RecursoNaoEncontradoException();
-		}
+		alterarCampos(alterarProdutoDTO, produto);
+		produtoRepository.save(produto);
 
-		alterarCampos(alterarProdutoDTO, produto.get());
-
-		var produtoAlterardo = produtoRepository.save(produto.get());
-	   return modelMapper.map(produtoAlterardo, ObterProdutoDTO.class);
+	   return modelMapper.map(produto, ObterProdutoDTO.class);
 	}
 
 	@Override
