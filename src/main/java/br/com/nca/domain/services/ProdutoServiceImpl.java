@@ -9,6 +9,9 @@ import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
 import br.com.nca.domain.repositories.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,9 +36,16 @@ public class ProdutoServiceImpl implements ProdutoService {
 	}
 
 	@Override
-	public List<ObterProdutoDTO> listar() {
-		// TODO Auto-generated method stub
-		return null;
+	public Page<ObterProdutoDTO> listar(int page, int size, String sortBy, String direction) {
+
+		var sort = direction.equalsIgnoreCase("desc")
+				? Sort.by(sortBy).descending()
+				: Sort.by(sortBy).ascending();
+
+		var pageable = PageRequest.of(page, size, sort);
+
+		return produtoRepository.findByAtivoTrue(pageable)
+				.map(produto -> modelMapper.map(produto, ObterProdutoDTO.class));
 	}
 
 	@Override
