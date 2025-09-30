@@ -1,18 +1,17 @@
 package br.com.nca.domain.services;
 
-import java.util.List;
-import java.util.UUID;
-
 import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.dtos.ObterPrecoMedioProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface ProdutoService {
 
 	ObterProdutoDTO buscarPorId(UUID id);
-
-	List<ObterProdutoDTO> listar();
 
 	ObterProdutoDTO cadastrar(CriarProdutoDTO criarProdutoDTO);
 
@@ -21,4 +20,6 @@ public interface ProdutoService {
 	ObterProdutoDTO desativar(UUID id);
 
 	List<ObterPrecoMedioProdutoDTO> obterPrecoMedioPorTipo();
+
+    Page<ObterProdutoDTO> listar(int page, int size, String sortBy, String direction);
 }
