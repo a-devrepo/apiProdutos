@@ -84,8 +84,15 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	public List<ObterPrecoMedioProdutoDTO> obterPrecoMedioPorTipo() {
-		// TODO Auto-generated method stub
-		return null;
+		return produtoRepository.obterPrecoMedioPorTipo()
+				.stream()
+				.map(p -> ObterPrecoMedioProdutoDTO
+						.builder()
+						.tipo(p.getTipo())
+						.precoMedio(p.getPrecoMedio())
+						.nome(p.getNome())
+						.quantidade(p.getQuantidade()).build())
+				.toList();
 	}
 
 	private void alterarCampos(AlterarProdutoDTO dto, Produto produto) {
