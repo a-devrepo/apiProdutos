@@ -2,7 +2,9 @@ package br.com.nca.controllers.unit;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -99,21 +102,27 @@ public class ProdutosControllerTest {
 				.precoUnitario(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
 						.build();
 		
-		var produtos = List.of(produtoDTO1, produtoDTO2);		
+		var produtos = List.of(produtoDTO1, produtoDTO2);
+		var page = new PageImpl<>(produtos);
 		
-				when(produtoService.listar()).thenReturn(produtos);
+				when(produtoService.listar(0,10,"nome","asc")).thenReturn(page);
 				
-				mockMvc.perform(get("/api/v1/produtos"))
+				mockMvc.perform(get("/api/v1/produtos")
+								.param("page","0")
+								.param("size","10")
+								.param("sortBy","nome")
+								.param("direction","asc"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(jsonPath("$[0].id").value(idProduto1.toString()))
-                    .andExpect(jsonPath("$[0].nome").value(produtoDTO1.getNome()))
-                    .andExpect(jsonPath("$[0].tipo").value(produtoDTO1.getTipo().toString()))
-                    .andExpect(jsonPath("$[0].precoUnitario").value(produtoDTO1.getPrecoUnitario().toString()))
-                    .andExpect(jsonPath("$[1].id").value(idProduto2.toString()))
-                    .andExpect(jsonPath("$[1].nome").value(produtoDTO2.getNome()))
-                    .andExpect(jsonPath("$[1].tipo").value(produtoDTO2.getTipo().toString()))
-                    .andExpect(jsonPath("$[1].precoUnitario").value(produtoDTO2.getPrecoUnitario().toString()));
+                    .andExpect(jsonPath("$.content.length()").value(2))
+                    .andExpect(jsonPath("$.content.[0].id").value(idProduto1.toString()))
+                    .andExpect(jsonPath("$.content.[0].nome").value(produtoDTO1.getNome()))
+                    .andExpect(jsonPath("$.content.[0].tipo").value(produtoDTO1.getTipo().toString()))
+                    .andExpect(jsonPath("$.content.[0].precoUnitario").value(produtoDTO1.getPrecoUnitario().toString()))
+                    .andExpect(jsonPath("$.content.[1].id").value(idProduto2.toString()))
+                    .andExpect(jsonPath("$.content.[1].nome").value(produtoDTO2.getNome()))
+                    .andExpect(jsonPath("$.content.[1].tipo").value(produtoDTO2.getTipo().toString()))
+                    .andExpect(jsonPath("$.content.[1].precoUnitario").value(produtoDTO2.getPrecoUnitario().toString()))
+						.andExpect(jsonPath("$.totalElements").value(2));
 	}
 	
 	@Test
