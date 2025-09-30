@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
 
+import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,18 @@ public class ProdutosControllerTest {
                     .andExpect(jsonPath("$.nome").value(produtoDTO.getNome()))
                     .andExpect(jsonPath("$.tipo").value(produtoDTO.getTipo().toString()))
                     .andExpect(jsonPath("$.precoUnitario").value(produtoDTO.getPrecoUnitario().toString()));
+	}
+
+	@Test
+	@DisplayName("Deve retornar código status not found")
+	public void deveRetornarCodigoStatusNotFound() throws Exception {
+
+		UUID id = UUID.randomUUID();
+
+		when(produtoService.buscarPorId(id)).thenThrow(RecursoNaoEncontradoException.class);
+
+		mockMvc.perform(get("/api/v1/produtos/{id}", id))
+				.andExpect(status().isNotFound());
 	}
 	
 	@Test
