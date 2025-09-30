@@ -66,8 +66,14 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	public ObterProdutoDTO desativar(UUID id) {
-		// TODO Auto-generated method stub
-		return null;
+
+		var produto = produtoRepository.findByIdAndAtivoTrue(id)
+				.orElseThrow(RecursoNaoEncontradoException::new);
+
+		produto.setAtivo(false);
+		produtoRepository.save(produto);
+
+		return modelMapper.map(produto, ObterProdutoDTO.class);
 	}
 
 	@Override
