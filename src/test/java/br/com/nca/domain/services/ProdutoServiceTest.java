@@ -1,4 +1,4 @@
-package br.com.nca.controllers.unit;
+package br.com.nca.domain.services;
 
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.entities.Produto;
@@ -6,8 +6,6 @@ import br.com.nca.domain.enums.TipoProduto;
 import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
 import br.com.nca.domain.repositories.PrecoMedioProjection;
 import br.com.nca.domain.repositories.ProdutoRepository;
-import br.com.nca.domain.services.ProdutoService;
-import br.com.nca.domain.services.ProdutoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static br.com.nca.controllers.unit.utils.ProdutoTestUtils.*;
+import static br.com.nca.utils.ProdutoTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;

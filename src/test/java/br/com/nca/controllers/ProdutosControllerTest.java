@@ -1,6 +1,5 @@
-package br.com.nca.controllers.unit;
+package br.com.nca.controllers;
 
-import br.com.nca.controllers.ProdutosController;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
 import br.com.nca.domain.exceptions.RecursoNaoEncontradoException;
 import br.com.nca.domain.services.ProdutoService;
@@ -18,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
 
-import static br.com.nca.controllers.unit.utils.ProdutoTestUtils.*;
+import static br.com.nca.utils.ProdutoTestUtils.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
