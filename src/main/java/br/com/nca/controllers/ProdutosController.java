@@ -45,7 +45,7 @@ public class ProdutosController {
     }
 
     @PatchMapping
-    public ResponseEntity<ObterProdutoDTO> alterar(@RequestBody AlterarProdutoDTO alterarProdutoDTO) {
+    public ResponseEntity<ObterProdutoDTO> alterar(@RequestBody @Valid AlterarProdutoDTO alterarProdutoDTO) {
         var obterProdutoDTO = produtoService.alterar(alterarProdutoDTO);
         return ResponseEntity.ok(obterProdutoDTO);
     }
