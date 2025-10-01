@@ -1,4 +1,4 @@
-package br.com.nca.controllers.unit.utils;
+package br.com.nca.utils;
 
 import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
