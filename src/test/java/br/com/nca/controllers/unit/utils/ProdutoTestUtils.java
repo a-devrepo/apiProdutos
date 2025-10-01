@@ -2,6 +2,7 @@ package br.com.nca.controllers.unit.utils;
 
 import br.com.nca.domain.dtos.AlterarProdutoDTO;
 import br.com.nca.domain.dtos.CriarProdutoDTO;
+import br.com.nca.domain.dtos.ObterPrecoMedioProdutoDTO;
 import br.com.nca.domain.dtos.ObterProdutoDTO;
 import br.com.nca.domain.entities.Produto;
 import br.com.nca.domain.enums.TipoProduto;
@@ -49,6 +50,15 @@ public class ProdutoTestUtils {
                 .nome(produto.getNome())
                 .tipo(produto.getTipo())
                 .precoUnitario(produto.getPrecoUnitario())
+                .build();
+    }
+
+    public static ObterPrecoMedioProdutoDTO getPrecoMedioProdutoDTO() {
+        return ObterPrecoMedioProdutoDTO.builder()
+                .nome(faker.commerce().productName())
+                .tipo(TipoProduto.MATERIAL)
+                .quantidade(3)
+                .precoMedio(new BigDecimal(faker.commerce().price(10.0, 500.0).replace(",", ".")))
                 .build();
     }
 }
